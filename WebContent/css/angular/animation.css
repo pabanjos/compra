@@ -1,0 +1,66 @@
+.animacaoAcesso.ng-leave.ng-leave-active,
+.animacaoAcesso.ng-move,
+.animacaoAcesso.ng-enter {
+	position: absolute;
+	width: 100%;
+  	top: -100px;
+  	opacity:0;
+  	transition: all linear 0.5s;
+}
+
+.animacaoAcesso.ng-leave,
+.animacaoAcesso.ng-move.ng-move-active,
+.animacaoAcesso.ng-enter.ng-enter-active {
+	position: relative;
+  	top: 0px;
+  	opacity:1;
+  	transition: all linear 0.5s;
+}
+
+
+
+.animacaoCliente.ng-move,
+.animacaoCliente.ng-enter,
+.animacaoCliente.ng-leave {
+  	transition:all linear 0.5s;
+}
+
+.animacaoCliente.ng-leave.ng-leave-active,
+.animacaoCliente.ng-move,
+.animacaoCliente.ng-enter {
+  	opacity:0;
+ 	max-height:0;
+}
+
+.animacaoCliente.ng-leave,
+.animacaoCliente.ng-move.ng-move-active,
+.animacaoCliente.ng-enter.ng-enter-active {
+  	opacity:1;
+  	max-height:30px;
+}
+
+
+
+.animacaoAdministrador.ng-move,
+.animacaoAdministrador.ng-enter,
+.animacaoAdministrador.ng-leave {
+	transition:all linear 1s;
+}
+
+.animacaoAdministrador.ng-leave.ng-leave-active,
+.animacaoAdministrador.ng-move,
+.animacaoAdministrador.ng-enter {
+	position:relative;
+  	height:0px;
+ 	opacity:1;
+	right: 200%;
+}
+
+.animacaoAdministrador.ng-leave,
+.animacaoAdministrador.ng-move.ng-move-active,
+.animacaoAdministrador.ng-enter.ng-enter-active {
+	position:relative;
+  	height:0px;
+  	opacity:1;
+	right:0px;
+}

@@ -1,0 +1,5 @@
+eclipse.preferences.version=1
+encoding//src/controle/soap/Banco.java=UTF-8
+encoding//src/controle/soap/BancoService.java=UTF-8
+encoding//src/controle/soap/BancoServiceLocator.java=UTF-8
+encoding//src/controle/soap/BancoSoapBindingStub.java=UTF-8

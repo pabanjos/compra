@@ -1,0 +1,284 @@
+h1 {
+	margin: 0px 0px 20px 0px;
+	padding: 10px;
+	text-align: center;
+	text-shadow: 2px 2px 3px black;
+}
+
+a {
+	cursor: pointer;
+}
+
+.red {
+	color: #EF9A9A;
+}
+
+.gray {
+	color: lightgray;
+}
+
+.green {
+	color: #A5D6A7;
+}
+
+.blue {
+	color: #90CAF9;
+}
+
+.minus-red {
+	color:red;
+}
+
+.plus-green {
+	color:green;
+}
+
+.button-left {
+	position: absolute;
+	left: 4px;
+	top: 4px;
+}
+
+.button-right {
+	position: absolute;
+	right: 4px;
+	top: 4px;
+}
+
+.left {
+	float: left;
+}
+
+.right {
+	float: right;
+}
+
+.colorAcesso {
+	background: #607D8B;
+	box-shadow: 0px 2px 20px #607D8B;
+}
+
+.colorCliente {
+	background: #455A64;
+	box-shadow: 0px 2px 20px #455A64;
+}
+
+.colorAdministrador {
+	background: #263238;
+	box-shadow: 0px 2px 20px #263238;
+}
+
+.colorTeal {
+	background: #004D40;
+	box-shadow: 0px 2px 20px #004D40;
+}
+
+.colorCyan {
+	background: #006064;
+	box-shadow: 0px 2px 20px #006064;
+}
+
+/* -------------------- table -------------------- */
+table {
+	width: 100%;
+	margin: 0px auto;
+	position: relative;
+	border-spacing: 0.3mm;
+	border: 2px solid #263238;
+}
+
+thead tr.coluna th:hover {
+	background: linear-gradient(to bottom, 
+						rgba(255, 255, 255, 0.2),
+						rgba(255, 255, 255, 0.2));
+	cursor: pointer;
+}
+
+tbody {
+	background: white;
+	color: black;
+}
+
+tbody tr.selecao:hover {
+	background: #CFD8DC;
+	cursor: pointer;
+}
+
+th, td {
+	height: 40px;
+	padding: 0.1% 0.3%;
+}
+
+/* -------------------- figure -------------------- */
+.filtro {
+	text-align: center;
+	width: 100%;
+	margin: 10px auto 30px auto;
+}
+
+figure {
+	position: relative;
+}
+
+figure.produto {
+	display: inline-block;
+	width: 144px;
+	margin: 1px 3px;
+}
+
+figure figcaption {
+	position: absolute;
+	bottom: 10px;
+	width: 100%;
+	opacity: 0;
+	text-shadow: 0px 0px 3px black;
+	font-size: 18px;
+	text-align: center;
+}
+
+figure:hover figcaption {
+	transition: 0.6s;
+	opacity: 1;
+}
+
+figure img {
+	width: 100%;
+}
+
+figure:hover img {
+	transition: 0.6s;
+	opacity: .1;
+}
+
+/* -------------------- menu -------------------- */
+li {
+	margin: 10px;
+	list-style: none;
+}
+
+/* -------------------- fieldset -------------------- */
+fieldset {
+	max-width: 450px;
+	padding: 10px;
+	margin: 10px 10px 20px 10px;
+	border-radius: 10px;
+	border: 1px solid white;
+	word-break: keep-all;
+}
+
+fieldset legend {
+	padding: 10px;
+	border-radius: 5px;
+	border: 1px solid white;
+	text-align: center;
+}
+
+ul {
+	list-style: none;
+}
+
+ul li {
+	word-break: break-all;
+}
+
+.conta {
+	width: 400px;
+	margin: 0px auto;
+	padding: 10px;
+	border-radius: 10px;
+}
+
+/* -------------------- chat -------------------- */
+div.content div.content-left details summary {
+	font-size: 24px;
+	margin: 0px;
+	padding: 10px;
+	border-radius: 10px;
+	text-align: center;
+	text-shadow: 2px 2px 3px black;
+	box-shadow: inset 0px 0px 1px white;
+	cursor: pointer;
+}
+
+div.content div.content-left details {
+	width: 100%;
+	border-radius: 10px;
+}
+
+div.content div.content-left details a {
+	display: block;
+	text-decoration: none;
+	font-size: 18px;
+	margin: 5px;
+	padding: 10px;
+	border-radius: 10px;
+	color: white;
+	text-shadow: 0px 0px 3px black;
+	box-shadow: inset 0px 0px 1px white;
+}
+
+div.content div.content-left details a:hover, div.content div.content-left details summary:hover
+	{
+	background-image: linear-gradient(transparent, rgba(255, 255, 255, 0.2)
+		0%, rgba(255, 255, 255, 0.2));
+}
+
+div.content div.content-right {
+	border-radius: 10px;
+}
+
+div.content div.content-right div.chat {
+	height: 300px;
+	overflow: auto;
+	background: #CFD8DC;
+	border-radius: 5px;
+	padding: 5px;
+	margin: 10px;
+}
+
+div.content div.content-right form {
+	margin: 10px;
+}
+
+div.content div.content-right div.chat p.center {
+	margin: 10px;
+}
+
+div.content div.content-right div.chat div.remetente, div.content div.content-right div.chat div.destinatario
+	{
+	margin: 5px;
+	padding: 10px;
+	width: 70%;
+	border-radius: 10px;
+}
+
+/* -------------------- alert -------------------- */
+.sucesso {
+	font-size: 24px;
+	color: #3c763d;
+	border-color: #d6e9c6;
+	background: #dff0d8;
+	width: 100%;
+	padding: 10px 0px 10px 0px;
+}
+
+.falha {
+	font-size: 24px;
+	color: #a94442;
+	border-color: #ebccd1;
+	background: #f2dede;
+	width: 100%;
+	padding: 10px 0px 10px 0px;
+}
+/*
+@keyframes move2 {
+	0%   {opacity: 0;}
+	20%  {opacity: 1;}
+	30%  {opacity: 0;}
+	35%  {opacity: 1;}
+	40%  {opacity: 0;}
+	45%  {opacity: 1;}
+	80%  {opacity: 1;}
+	100% {opacity: 0;}
+}
+*/

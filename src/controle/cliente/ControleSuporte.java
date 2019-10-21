@@ -10,32 +10,33 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import modelo.entidades.Conta;
-import modelo.entidades.Mensagem;
-import modelo.persistencia.DaoConta;
+import beans.Mensagem;
+import beans.Usuario;
 import modelo.persistencia.DaoLista;
 import modelo.persistencia.DaoMensagem;
+import modelo.persistencia.DaoUsuario;
 
 @WebServlet("/ControleChat")
 public class ControleSuporte extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	protected void service(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+	protected void service(final HttpServletRequest req, final HttpServletResponse res)
+			throws ServletException, IOException {
 		HttpSession session = req.getSession();
-		Conta logado = (Conta) session.getAttribute("logado");
-		Conta destinatario = (Conta) session.getAttribute("destinatario");
+		Usuario logado = (Usuario) session.getAttribute("logado");
+		Usuario destinatario = (Usuario) session.getAttribute("destinatario");
 		try {
 			String acao = req.getParameter("acao");
 			if (acao.equals("buscar")) {
-				Integer idContato = Integer.parseInt(req.getParameter("idContato"));
-				destinatario = new DaoConta().selecionarContaPorId(idContato);
+				Integer idUsuarioto = Integer.parseInt(req.getParameter("idUsuarioto"));
+				destinatario = new DaoUsuario().selecionarUsuarioPorId(idUsuarioto);
 				session.setAttribute("destinatario", destinatario);
-				new DaoMensagem().atualizarVisualizadas(idContato, logado.getIdConta());
+				new DaoMensagem().atualizarVisualizadas(idUsuarioto, logado.getIdUsuario());
 			} else if (acao.equals("enviar")) {
 				if (req.getParameter("texto") != null) {
 					String texto = req.getParameter("texto");
-					new DaoMensagem().inserir(censurar(texto), logado.getIdConta(), destinatario.getIdConta());
+					new DaoMensagem().inserir(censurar(texto), logado.getIdUsuario(), destinatario.getIdUsuario());
 				}
 			}
 		} catch (Exception e) {
@@ -45,19 +46,22 @@ public class ControleSuporte extends HttpServlet {
 		}
 	}
 
-	private String censurar(String texto) {
-		return texto.replace("\n", " ").replace("caralho", "c******").replace("porra", "p****").replace("fuder", "f****").replace("puta", "p***").replace("vsf", "v**").replace("fdp", "f**");
+	private String censurar(final String texto) {
+		return texto.replace("\n", " ").replace("caralho", "c******").replace("porra", "p****")
+				.replace("fuder", "f****").replace("puta", "p***").replace("vsf", "v**").replace("fdp", "f**");
 	}
 
-	private void retornar(HttpServletRequest req, HttpServletResponse res, Conta destinatario) {
-		Conta logado = (Conta) req.getSession().getAttribute("logado");
+	private void retornar(final HttpServletRequest req, final HttpServletResponse res, final Usuario destinatario) {
+		Usuario logado = (Usuario) req.getSession().getAttribute("logado");
 		String saida = "{\"contas\":[";
 		try {
-			List<Conta> contas = new DaoLista().selecionarContas();
+			List<Usuario> contas = new DaoLista().selecionarUsuarios();
 			for (int x = 0; x < contas.size(); x++) {
 				int naoVisualizadas = 0;
-				for (Mensagem mensagem : new DaoMensagem().selecionar(logado.getIdConta(), contas.get(x).getIdConta())) {
-					if (mensagem.getDestinatario().getIdConta().equals(logado.getIdConta()) && mensagem.getVisualizada().equals("nao")) {
+				for (Mensagem mensagem : new DaoMensagem().selecionar(logado.getIdUsuario(),
+						contas.get(x).getIdUsuario())) {
+					if (mensagem.getDestinatario().getIdUsuario().equals(logado.getIdUsuario())
+							&& mensagem.getVisualizada().equals("nao")) {
 						naoVisualizadas++;
 					}
 				}
@@ -70,7 +74,8 @@ public class ControleSuporte extends HttpServlet {
 			saida += "]";
 			if (destinatario != null) {
 				saida += ",\"destinatario\":" + destinatario;
-				saida += ",\"mensagens\":" + new DaoMensagem().selecionar(logado.getIdConta(), destinatario.getIdConta()).toString();
+				saida += ",\"mensagens\":"
+						+ new DaoMensagem().selecionar(logado.getIdUsuario(), destinatario.getIdUsuario()).toString();
 			}
 			saida += "}";
 			res.setContentType("application/json");

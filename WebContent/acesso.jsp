@@ -8,8 +8,8 @@
 	    Cadastrar
 	</button>
 	<form name="acesso" class="pure-form right" novalidate>
-		<input type="text" placeholder="Usuario" data-ng-model="teste.usuario" maxlength="10" size="10" required> 
-		<input type="password" placeholder="Senha" data-ng-model="teste.senha" maxlength="10" size="10"  required>
+		<input type="text" placeholder="Login" data-ng-model="usuario.login" maxlength="10" size="10" required> 
+		<input type="password" placeholder="Senha" data-ng-model="usuario.senha" maxlength="10" size="10"  required>
 		<button type="submit" data-ng-click="entrar()" class="pure-button pure-button-primary">
 			Acessar <i class="fa fa-sign-in"></i>
 		</button>
@@ -18,18 +18,18 @@
 
 <div data-ui-view class="animacaoAcesso"></div>
 
-<footer data-ng-show="mensagem.sucesso" data-ng-mouseover="apagarMensagem()" class="sucesso">
+<footer data-ng-show="logs.tipo === 'sucesso'" data-ng-mouseover="apagarMensagem()" class="sucesso">
 	<b>
 		<i class="fa fa-check-circle-o fa-lg"></i> 
-		{{mensagem.sucesso}} 
+		{{logs.texto}} 
 		<i class="fa fa-exclamation"></i>
 	</b>
 </footer>
 
-<footer data-ng-show="mensagem.falha" data-ng-mouseover="apagarMensagem()" class="falha">
+<footer data-ng-show="logs.tipo === 'falha'" data-ng-mouseover="apagarMensagem()" class="falha">
 	<b>
 		<i class="fa fa-times-circle fa-lg"></i> 
-		{{mensagem.falha}} 
+		{{logs.texto}} 
 		<i class="fa fa-exclamation"></i>
 	</b>
 </footer>

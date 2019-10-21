@@ -9,8 +9,8 @@
 			</button>
 		</figcaption>
 	</figure>
-	<a data-ui-sref=".contas" data-ng-click="apagarMensagem()" class="button-adm">
-		<i class="fa fa-users"></i> Clientes
+	<a data-ui-sref=".usuarios" data-ng-click="apagarMensagem()" class="button-adm">
+		<i class="fa fa-users"></i> Usuarios
 	</a> 
 	<a data-ui-sref=".filmes" data-ng-click="apagarMensagem()" class="button-adm">
 		<i class="fa fa-tags"></i> Filmes
@@ -18,14 +18,14 @@
 	<a data-ui-sref=".mensagens" data-ng-click="apagarMensagem()" class="button-adm">
 		<i class="fa fa-comments"></i> Mensagens
 	</a> 
-	<a data-ui-sref=".transacoes" data-ng-click="apagarMensagem()" class="button-adm">
-		<i class="fa fa-usd"></i> Transações
+	<a data-ui-sref=".operacoes" data-ng-click="apagarMensagem()" class="button-adm">
+		<i class="fa fa-usd"></i> Operações
 	</a> 
 	<a data-ui-sref=".compras" data-ng-click="apagarMensagem()" class="button-adm">
 		<i class="fa fa-shopping-cart"></i> Compras
 	</a>
-	<a data-ui-sref=".acessos" data-ng-click="apagarMensagem()" class="button-adm">
-		<i class="fa fa-pencil-square-o"></i> Acessos
+	<a data-ui-sref=".registros" data-ng-click="apagarMensagem()" class="button-adm">
+		<i class="fa fa-pencil-square-o"></i> Registros
 	</a> 
 	<a data-ui-sref=".suporte" data-ng-click="apagarMensagem()" class="button-adm">
 		<i class="fa fa-comment"></i> Suporte

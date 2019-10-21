@@ -2,15 +2,15 @@ drop database if exists compra;
 create database compra;
 use compra;
 
-create table Conta (
-    idConta         int             primary key    auto_increment,
-    usuario         varchar(15)     unique,
+create table usuario (
+    idUsuario		int             primary key    auto_increment,
+    login			varchar(15)     unique,
     senha           varchar(15),
     perfil          varchar(15),
     saldo           int
 );
 
-create table Pessoa (
+create table pessoa (
     idPessoa        int             primary key    auto_increment,
 	nome            varchar(15),
 	email           varchar(20),
@@ -18,31 +18,31 @@ create table Pessoa (
 	telefone        varchar(15),
 	cep             varchar(15),
 	nascimento      date,
-	conta           int             unique,
-    foreign key (conta) references Conta (idConta) ON DELETE CASCADE
+	usuario			int             unique,
+    foreign key (usuario) references usuario (idUsuario) ON DELETE CASCADE
 );
 
-create table Acesso (
+create table acesso (
     idAcesso        int             primary key    auto_increment,
     nome            varchar(20),
     ip              varchar(20),
     data            timestamp,
-	conta           int,
-    foreign key (conta) references Conta (idConta) ON DELETE CASCADE
+	usuario			int,
+    foreign key (usuario) references usuario (idUsuario) ON DELETE CASCADE
 );
 
-create table Transacao (
-    idTransacao     int             primary key    auto_increment,
-    operacao        varchar(20),
+create table operacao (
+    idOperacao      int             primary key    auto_increment,
+    tipo            varchar(20),
     valor           int,
     data            timestamp,
-    contaLocal      int,
-    contaDestino    int,
-    foreign key (contaLocal) references Conta (idConta) ON DELETE CASCADE,
-    foreign key (contaDestino) references Conta (idConta) ON DELETE CASCADE
+    usuarioLocal    int,
+    usuarioDestino  int,
+    foreign key (usuarioLocal) references usuario (idUsuario) ON DELETE CASCADE,
+    foreign key (usuarioDestino) references usuario (idUsuario) ON DELETE CASCADE
 );
 
-create table Filme (
+create table filme (
 	idFilme 		int 			primary key 	auto_increment,
 	poster 			varchar(99),
 	titulo 			varchar(99),
@@ -54,29 +54,29 @@ create table Filme (
 	estoque         int
 );
 
-create table Compra (
+create table compra (
     idCompra        int             primary key    auto_increment,
     quantidade      int,
     status          varchar(50),
     data            timestamp,
-    conta           int,
+    usuario         int,
     filme           int,
-    foreign key (conta) references Conta (idConta) ON DELETE CASCADE,
-    foreign key (filme) references Filme (idFilme) ON DELETE CASCADE
+    foreign key (usuario) references usuario (idUsuario) ON DELETE CASCADE,
+    foreign key (filme) references filme (idFilme) ON DELETE CASCADE
 );
 
-create table Mensagem (
+create table mensagem (
     idMensagem      int             primary key    auto_increment,
     texto           varchar(140),
     data            timestamp,
     visualizada     varchar(3),
     remetente       int,
     destinatario    int,
-    foreign key (remetente) references Conta (idConta) ON DELETE CASCADE,
-    foreign key (destinatario) references Conta (idConta) ON DELETE CASCADE
+    foreign key (remetente) references usuario (idUsuario) ON DELETE CASCADE,
+    foreign key (destinatario) references usuario (idUsuario) ON DELETE CASCADE
 );
 
-insert into Conta values
+insert into usuario values
 (1,'123','123','Administrador',0),
 (2,'qwe','qwe','Cliente',400),
 (3,'asd','asd','Cliente',400),
@@ -85,7 +85,7 @@ insert into Conta values
 (6,'wsx','wsx','Cliente',400),
 (7,'edc','edc','Cliente',400);
 
-insert into Pessoa values
+insert into pessoa values
 (1,'123','123@123123','Masculino','2111111111','21550530','2016-06-09',1),
 (2,'qwe','qwe@qweqwe','Masculino','2111111111','21550530','2016-06-09',2),
 (3,'asd','asd@asdasd','Masculino','2122222222','21550530','2016-06-07',3),
@@ -94,7 +94,15 @@ insert into Pessoa values
 (6,'wsx','wsx@wsxwsx','Feminino','2155555555','21550530','2015-06-09',6),
 (7,'edc','edc@edcedc','Feminino','2166666666','21550530','2014-06-01',7);
 
-INSERT INTO Filme VALUES
+insert into mensagem values
+(1,'oi',now(),'S',1,2),
+(2,'ola',now(),'N',2,1);
+
+insert into operacao values
+(1,'deposito',20,now(),1,2),
+(2,'saque',10,now(),2,2);
+
+INSERT INTO filme VALUES
 (null,'Snow White and the Seven Dwarfs 1937.jpg','Snow White and the Seven Dwarfs','Animation',null,'William Cottrell',1937,77,10),
 (null,'The Lion King 1994.jpg','The Lion King','Animation',null,'Roger Allers e Rob Minkoff',1994,85,10),
 (null,'Pocahontas 1995.jpg','Pocahontas','Animation',null,'Mike Gabriel e Eric Goldberg',1995,66,10),
@@ -359,3 +367,13 @@ INSERT INTO Filme VALUES
 (null,'[Rec] 2007.jpg','[Rec]','Terror','Manuela Velasco','Jaume Balagueró',2007,75,10),
 (null,'Grave Encounters 2011.jpg','Grave Encounters','Terror','Ben Wilkinson','Colin Minihan',2011,61,10),
 (null,'As Above, So Below 2014.jpg','As Above, So Below','Terror','Perdita Weeks','John Erick Dowdle',2014,61,10);
+
+insert into compra values
+(1,3,'pendente',now(),2,10),
+(2,3,'pendente',now(),2,20),
+(3,3,'pendente',now(),2,30),
+(4,3,'pendente',now(),2,40),
+(5,3,'pendente',now(),2,50),
+(6,3,'pendente',now(),2,60),
+(7,3,'pendente',now(),2,70);
+

@@ -25,13 +25,13 @@
 				</tr>
 			</thead>
 			<tbody data-ng-init="limit=8">
-				<tr data-ng-repeat="item in lista | filter:search | orderBy:order:direction | limitTo:limit">
-					<th>{{item.quantidade}}</th>
-					<th>{{item.status}}</th>
-					<th>{{item.data | date:'dd/MM/yyyy'}} às {{item.data | date:'hh:mm'}}</th>
-					<th>{{item.conta.usuario}}</th>
-					<th>{{item.filme.titulo}}</th>
-					<th>{{item.filme.preco | currency : "R$" }}</th>
+				<tr data-ng-repeat="compra in lista | filter:search | orderBy:order:direction | limitTo:limit">
+					<th>{{compra.quantidade}}</th>
+					<th>{{compra.status}}</th>
+					<th>{{compra.data | date:'dd/MM/yyyy'}} às {{compra.data | date:'hh:mm'}}</th>
+					<th>{{compra.usuario.login}}</th>
+					<th>{{compra.filme.titulo}}</th>
+					<th>{{compra.filme.preco | currency : "R$" }}</th>
 				</tr>
 			</tbody>
 		</table>

@@ -35,14 +35,14 @@
 				</tr>
 			</thead>
 			<tbody data-ng-init="limit=8">
-				<tr data-ng-repeat="item in lista | filter:search | orderBy:order:direction | limitTo : limit" data-ng-click="selecionar(item)" class="selecao">
-					<th>{{item.titulo}}</th>
-					<th>{{item.genero}}</th>
-					<th>{{item.protagonista}}</th>
-					<th>{{item.diretor}}</th>
-					<th>{{item.lancamento}}</th>
-					<th>{{item.preco | currency : "R$" }}</th>
-					<th>{{item.estoque}}</th>
+				<tr data-ng-repeat="filme in lista | filter:search | orderBy:order:direction | limitTo : limit" data-ng-click="selecionar(item)" class="selecao">
+					<th>{{filme.titulo}}</th>
+					<th>{{filme.genero}}</th>
+					<th>{{filme.protagonista}}</th>
+					<th>{{filme.diretor}}</th>
+					<th>{{filme.lancamento}}</th>
+					<th>{{filme.preco | currency : "R$" }}</th>
+					<th>{{filme.estoque}}</th>
 				</tr>
 			</tbody>
 		</table>

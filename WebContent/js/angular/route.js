@@ -33,17 +33,17 @@ compra.config(function($stateProvider, $urlRouterProvider) {
 		url : "/administrador",
 		templateUrl : "administrador/aside.jsp",
 		controller : "controleAdministrador"
-	}).state('administrador.contas', {
-		url : "/contas",
-		templateUrl : "administrador/contas.jsp",
+	}).state('administrador.usuarios', {
+		url : "/usuarios",
+		templateUrl : "administrador/usuarios.jsp",
 		controller : "controleAdministrador"
 	}).state('administrador.filmes', {
 		url : "/filmes",
 		templateUrl : "administrador/filmes.jsp",
 		controller : "controleAdministrador"
-	}).state('administrador.acessos', {
-		url : "/acessos",
-		templateUrl : "administrador/acessos.jsp",
+	}).state('administrador.registros', {
+		url : "/registros",
+		templateUrl : "administrador/registros.jsp",
 		controller : "controleAdministrador"
 	}).state('administrador.mensagens', {
 		url : "/mensagens",
@@ -53,9 +53,9 @@ compra.config(function($stateProvider, $urlRouterProvider) {
 		url : "/compras",
 		templateUrl : "administrador/compras.jsp",
 		controller : "controleAdministrador"
-	}).state('administrador.transacoes', {
-		url : "/transacoes",
-		templateUrl : "administrador/transacoes.jsp",
+	}).state('administrador.operacoes', {
+		url : "/operacoes",
+		templateUrl : "administrador/operacoes.jsp",
 		controller : "controleAdministrador"
 	}).state('administrador.suporte', {
 		url : "/suporte",

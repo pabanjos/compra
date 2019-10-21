@@ -1,15 +1,16 @@
 package modelo.persistencia;
 
-import modelo.entidades.Acesso;
+import beans.Registro;
+import utils.Dao;
 
 public class DaoAcesso extends Dao {
 
-	public void inserirAcesso(Acesso acesso) throws Exception {
-		conectar();
-		ps = con.prepareStatement("insert into Acesso values (null,?,?,now(),?)");
+	public void inserirAcesso(final Registro acesso) throws Exception {
+		abrirConexao("compra");
+		ps = con.prepareStatement("insert into acesso values (null,?,?,now(),?)");
 		ps.setString(1, acesso.getNome());
 		ps.setString(2, acesso.getIp());
-		ps.setInt(3, acesso.getConta().getIdConta());
+		ps.setInt(3, acesso.getUsuario().getIdUsuario());
 		ps.execute();
 		con.close();
 	}

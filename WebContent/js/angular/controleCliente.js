@@ -1,42 +1,56 @@
 compra.controller('controleCliente', [ '$scope', '$rootScope', '$http', '$location', function($scope, $rootScope, $http, $location) {
+	
+	$scope.prefixo = 'http://localhost:8080/WebService_REST/api'
+	
 	/* acesso */
 	$scope.entrar = function() {
-		$http({
-			method : 'POST',
-			url : 'ControleConta',
-			params : {
-				acao : 'entrar',
-				usuario : $scope.teste.usuario,
-				senha : $scope.teste.senha
-			}
-		}).then(function(response) {
+		$http.post($scope.prefixo + '/usuarios/entrar', $scope.usuario
+		).then(function(response) {
 			$scope.resposta = response.data;
-			if($scope.resposta.logado === undefined) {
+			if($scope.resposta.dados === undefined) {
 				$location.path("/acesso");
 			} else {
-				$rootScope.logado = $scope.resposta.logado;
+				$rootScope.logado = $scope.resposta.dados;
 				if ($rootScope.logado.perfil === 'Cliente') {
-					$rootScope.saldo = $scope.resposta.logado.saldo;
+					$rootScope.saldo = $rootScope.logado.saldo;
 					$location.path("/cliente");
 				} else if ($rootScope.logado.perfil === 'Administrador') {
 					$location.path("/administrador");
 				}
 			}
-			$rootScope.mensagem = $scope.resposta.mensagem;
+			$rootScope.logs = $scope.resposta.logs;
 		}, function(response) {
+			console.log(response)
 		});
-		$scope.teste = {};
+		$scope.usuario = {};
 	};
+	
+	$scope.sair = function() {
+		delete $rootScope.logado;
+		$location.path("/acesso");
+		/*
+		$http({
+			method : 'GET',
+			url : $scope.prefixo + '/usuarios/sair'
+		}).then(function(response) {
+			$scope.resposta = response.data;
+			$rootScope.logs = $scope.resposta.logs;
+			delete $rootScope.logado;
+			$location.path("/acesso");
+		}, function(response) {
+		});*/
+	};
+	
 	$scope.apagarMensagem = function() {
-		$rootScope.mensagem = {};
+		$rootScope.logs = {};
 	}
+	
 	$scope.cadastrar = function() {
 		$http({
 			method : 'POST',
-			url : 'ControleConta',
+			url : $scope.prefixo + '/usuarios',
 			params : {
-				acao : 'cadastrar',
-				usuario : $scope.nova.usuario,
+				login : $scope.nova.login,
 				senha : $scope.nova.senha,
 				nome : $scope.nova.nome,
 				email : $scope.nova.email,
@@ -47,15 +61,17 @@ compra.controller('controleCliente', [ '$scope', '$rootScope', '$http', '$locati
 			}
 		}).then(function(response) {
 			$scope.resposta = response.data;
-			$rootScope.mensagem = $scope.resposta.mensagem;
+			$rootScope.logs = $scope.resposta.logs;
 		}, function(response) {
+			console.log(response)
 		});
 		delete $scope.nova;
 	};
+	
 	$scope.buscar = function() {
 		$http({
 			method : 'POST',
-			url : 'ControleConta',
+			url : 'ControleUsuario',
 			params : {
 				acao : 'buscar'
 			}
@@ -63,17 +79,19 @@ compra.controller('controleCliente', [ '$scope', '$rootScope', '$http', '$locati
 			$scope.resposta = response.data;
 			$rootScope.saldo = $scope.resposta.saldo;
 			$rootScope.logado = $scope.resposta.logado;
-			$rootScope.mensagem = $scope.resposta.mensagem;
+			$rootScope.logs = $scope.resposta.logs;
 		}, function(response) {
+			console.log(response)
 		});
 	};
+	
 	$scope.atualizar = function() {
 		$http({
 			method : 'POST',
-			url : 'ControleConta',
+			url : 'ControleUsuario',
 			params : {
 				acao : 'atualizar',
-				usuario : $scope.usuario,
+				login : $scope.login,
 				senha : $scope.senha,
 				nome : $scope.nome,
 				email : $scope.email,
@@ -84,40 +102,30 @@ compra.controller('controleCliente', [ '$scope', '$rootScope', '$http', '$locati
 		}).then(function(response) {
 			$scope.resposta = response.data;
 			$rootScope.logado = $scope.resposta.logado;
-			$rootScope.mensagem = $scope.resposta.mensagem;
+			$rootScope.logs = $scope.resposta.logs;
 		}, function(response) {
+			console.log(response)
 		});
 	};
+	
 	$scope.deletar = function() {
 		$http({
 			method : 'POST',
-			url : 'ControleConta',
+			url : 'ControleUsuario',
 			params : {
 				acao : 'deletar'
 			}
 		}).then(function(response) {
 			$scope.resposta = response.data;
-			$rootScope.mensagem = $scope.resposta.mensagem;
+			$rootScope.logs = $scope.resposta.logs;
 			delete $rootScope.logado;
 			$location.path("/acesso");
 		}, function(response) {
+			console.log(response)
 		});
 	};
-	$scope.sair = function() {
-		$http({
-			method : 'POST',
-			url : 'ControleConta',
-			params : {
-				acao : 'sair'
-			}
-		}).then(function(response) {
-			$scope.resposta = response.data;
-			$rootScope.mensagem = $scope.resposta.mensagem;
-			delete $rootScope.logado;
-			$location.path("/acesso");
-		}, function(response) {
-		});
-	};
+	
+	
 	/* banco */
 	$scope.efetuar = function() {
 		$http({
@@ -132,11 +140,13 @@ compra.controller('controleCliente', [ '$scope', '$rootScope', '$http', '$locati
 		}).then(function(response) {
 			$scope.resposta = response.data;
 			$rootScope.saldo = $scope.resposta.saldo;
-			$rootScope.mensagem = $scope.resposta.mensagem;
+			$rootScope.logs = $scope.resposta.logs;
 		}, function(response) {
+			console.log(response)
 		});
 		delete $scope.banco;
 	};
+	
 	$scope.exportar = function() {
 		$http({
 			method : 'POST',
@@ -146,10 +156,13 @@ compra.controller('controleCliente', [ '$scope', '$rootScope', '$http', '$locati
 			}
 		}).then(function(response) {
 			$scope.resposta = response.data;
-			$rootScope.mensagem = $scope.resposta.mensagem;
+			$rootScope.logs = $scope.resposta.logs;
 		}, function(response) {
+			console.log(response)
 		});
 	};
+	
+	
 	/* compra */
 	$scope.exibir = function() {
 		$http({
@@ -158,8 +171,10 @@ compra.controller('controleCliente', [ '$scope', '$rootScope', '$http', '$locati
 		}).then(function(response) {
 			$scope.lista = response.data;
 		}, function(response) {
+			console.log(response)
 		});
 	};
+	
 	$scope.calcular = function() {
 		$http({
 			method : 'POST',
@@ -169,10 +184,12 @@ compra.controller('controleCliente', [ '$scope', '$rootScope', '$http', '$locati
 			}
 		}).then(function(response) {
 			$scope.resposta = response.data;
-			$rootScope.mensagem = $scope.resposta.mensagem;
+			$rootScope.logs = $scope.resposta.logs;
 		}, function(response) {
+			console.log(response)
 		});
 	};
+	
 	$scope.remover = function(id) {
 		$http({
 			method : 'POST',
@@ -183,10 +200,12 @@ compra.controller('controleCliente', [ '$scope', '$rootScope', '$http', '$locati
 			}
 		}).then(function(response) {
 			$scope.resposta = response.data;
-			$rootScope.mensagem = $scope.resposta.mensagem;
+			$rootScope.logs = $scope.resposta.logs;
 		}, function(response) {
+			console.log(response)
 		});
 	};
+	
 	$scope.adicionar = function(id) {
 		$http({
 			method : 'POST',
@@ -197,10 +216,12 @@ compra.controller('controleCliente', [ '$scope', '$rootScope', '$http', '$locati
 			}
 		}).then(function(response) {
 			$scope.resposta = response.data;
-			$rootScope.mensagem = $scope.resposta.mensagem;
+			$rootScope.logs = $scope.resposta.logs;
 		}, function(response) {
+			console.log(response)
 		});
 	};
+	
 	$scope.inserir = function() {
 		$http({
 			method : 'POST',
@@ -211,11 +232,13 @@ compra.controller('controleCliente', [ '$scope', '$rootScope', '$http', '$locati
 			}
 		}).then(function(response) {
 			$scope.resposta = response.data;
-			$rootScope.mensagem = $scope.resposta.mensagem;
+			$rootScope.logs = $scope.resposta.logs;
 		}, function(response) {
+			console.log(response)
 		});
 		delete $scope.cupom;
 	};
+	
 	$scope.retirar = function() {
 		$http({
 			method : 'POST',
@@ -225,10 +248,12 @@ compra.controller('controleCliente', [ '$scope', '$rootScope', '$http', '$locati
 			}
 		}).then(function(response) {
 			$scope.resposta = response.data;
-			$rootScope.mensagem = $scope.resposta.mensagem;
+			$rootScope.logs = $scope.resposta.logs;
 		}, function(response) {
+			console.log(response)
 		});
 	};
+	
 	$scope.finalizar = function() {
 		$http({
 			method : 'POST',
@@ -239,10 +264,12 @@ compra.controller('controleCliente', [ '$scope', '$rootScope', '$http', '$locati
 		}).then(function(response) {
 			$scope.resposta = response.data;
 			$rootScope.saldo = $scope.resposta.saldo;
-			$rootScope.mensagem = $scope.resposta.mensagem;
+			$rootScope.logs = $scope.resposta.logs;
 		}, function(response) {
+			console.log(response)
 		});
 	};
+	
 	$scope.salvar = function() {
 		$http({
 			method : 'POST',
@@ -252,10 +279,13 @@ compra.controller('controleCliente', [ '$scope', '$rootScope', '$http', '$locati
 			}
 		}).then(function(response) {
 			$scope.resposta = response.data;
-			$rootScope.mensagem = $scope.resposta.mensagem;
+			$rootScope.logs = $scope.resposta.logs;
 		}, function(response) {
+			console.log(response)
 		});
 	};
+	
+	
 	/* chat */
 	$scope.exibirContas = function() {
 		$http({
@@ -267,8 +297,10 @@ compra.controller('controleCliente', [ '$scope', '$rootScope', '$http', '$locati
 		}).then(function(response) {
 			$scope.chat = response.data;
 		}, function(response) {
+			console.log(response)
 		});
 	};
+	
 	$scope.exibirChat = function(id) {
 		$http({
 			method : 'POST',
@@ -280,8 +312,10 @@ compra.controller('controleCliente', [ '$scope', '$rootScope', '$http', '$locati
 		}).then(function(response) {
 			$scope.chat = response.data;
 		}, function(response) {
+			console.log(response)
 		});
 	};
+	
 	$scope.enviar = function() {
 		$http({
 			method : 'POST',
@@ -293,7 +327,9 @@ compra.controller('controleCliente', [ '$scope', '$rootScope', '$http', '$locati
 		}).then(function(response) {
 			$scope.chat = response.data;
 		}, function(response) {
+			console.log(response)
 		});
 		delete $scope.texto;
 	};
+	
 } ]);

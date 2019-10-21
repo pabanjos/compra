@@ -9,10 +9,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import beans.Compra;
+import beans.Filme;
+import beans.Usuario;
 import controle.soap.BancoProxy;
-import modelo.entidades.Compra;
-import modelo.entidades.Conta;
-import modelo.entidades.Filme;
 import modelo.persistencia.DaoCompra;
 import modelo.persistencia.DaoFilme;
 
@@ -21,8 +21,9 @@ public class ControleCarrinho extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	protected void service(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-		Conta logado = (Conta) req.getSession().getAttribute("logado");
+	protected void service(final HttpServletRequest req, final HttpServletResponse res)
+			throws ServletException, IOException {
+		Usuario logado = (Usuario) req.getSession().getAttribute("logado");
 		String acao = req.getParameter("acao");
 		String mensagem = "{}";
 		try {
@@ -42,7 +43,7 @@ public class ControleCarrinho extends HttpServlet {
 					compra.setQuantidade(1);
 					compra.setStatus("Pendente");
 					compra.setData(LocalDateTime.now());
-					compra.setConta(logado);
+					compra.setUsuario(logado);
 					compra.setFilme(new DaoFilme().selecionarPorId(idFilme));
 					logado.getCompras().put(idFilme, compra);
 					calcular(logado);
@@ -63,7 +64,7 @@ public class ControleCarrinho extends HttpServlet {
 			} else if (acao.equals("inserir")) {
 				if (req.getParameter("cupom") != null) {
 					Integer cupom = Integer.parseInt(req.getParameter("cupom"));
-					if (cupom >= 1 && cupom <= 100) {
+					if ((cupom >= 1) && (cupom <= 100)) {
 						Compra.setDesconto(cupom);
 						mensagem = "{\"sucesso\":\"Cupom inserido\"}";
 						calcular(logado);
@@ -99,7 +100,7 @@ public class ControleCarrinho extends HttpServlet {
 					}
 					/* - finalizar a compra, ou nao - */
 					if (finalizar) {
-						new DaoCompra().deletar(logado.getIdConta());
+						new DaoCompra().deletar(logado.getIdUsuario());
 						for (Compra c : logado.getCompras().values()) {
 							c.getFilme().setEstoque(c.getFilme().getEstoque() - c.getQuantidade());
 							c.setStatus("Comprado");
@@ -110,7 +111,7 @@ public class ControleCarrinho extends HttpServlet {
 						new DaoCompra().inserir(logado);
 						logado.getCompras().clear();
 						logado.setSaldo(logado.getSaldo() - Compra.getValorTotalFinal());
-						new BancoProxy().atualizarSaldo(logado.getSaldo(), logado.getIdConta());
+						new BancoProxy().atualizarSaldo(logado.getSaldo(), logado.getIdUsuario());
 						calcular(logado);
 						mensagem = "{\"sucesso\":\"Compra finalizada e nota fiscal salva\"}";
 					}
@@ -124,7 +125,7 @@ public class ControleCarrinho extends HttpServlet {
 		}
 	}
 
-	public static void calcular(Conta logado) throws Exception {
+	public static void calcular(final Usuario logado) throws Exception {
 		Compra.setQuantidadeTotal(0);
 		Compra.setValorTotal(0);
 		Compra.setValorTotalFinal(0);
@@ -142,7 +143,8 @@ public class ControleCarrinho extends HttpServlet {
 		Compra.setValorTotalFinal(Compra.getValorTotalFinal() + Compra.getFrete());
 	}
 
-	private void retornar(HttpServletRequest req, HttpServletResponse res, Conta logado, String mensagem) throws IOException {
+	private void retornar(final HttpServletRequest req, final HttpServletResponse res, final Usuario logado,
+			final String mensagem) throws IOException {
 		String json = "{\"mensagem\":" + mensagem;
 		if (logado != null) {
 			json += ",\"saldo\":" + logado.getSaldo();
@@ -160,5 +162,5 @@ public class ControleCarrinho extends HttpServlet {
 		res.getWriter().flush();
 		res.getWriter().close();
 	}
-	
+
 }

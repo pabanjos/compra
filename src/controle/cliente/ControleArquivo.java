@@ -6,24 +6,23 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-import modelo.entidades.Compra;
-import modelo.entidades.Conta;
-import modelo.entidades.Transacao;
-import modelo.persistencia.DaoTransacao;
+import beans.Compra;
+import beans.Operacao;
+import beans.Usuario;
+import modelo.persistencia.DaoOperacao;
 
 public class ControleArquivo {
-	
-	
-	public static void main(String[] args) {
+
+	public static void main(final String[] args) {
 		System.out.println(new BigDecimal("5.55").multiply(new BigDecimal("2.22")));
 	}
 
-	public void exportar(Conta logado, String arquivo) throws Exception {
+	public void exportar(final Usuario logado, final String arquivo) throws Exception {
 		File f1 = new File("C:\\arquivos");
 		if (!f1.exists()) {
 			f1.mkdir();
 		}
-		File f2 = new File(f1 + "\\" + logado.getUsuario());
+		File f2 = new File(f1 + "\\" + logado.getLogin());
 		if (!f2.exists()) {
 			f2.mkdir();
 		}
@@ -37,7 +36,7 @@ public class ControleArquivo {
 				fw.write(c.toCSV());
 			}
 		} else if (arquivo.equals("extrato")) {
-			for (Transacao t : new DaoTransacao().selecionarPorConta(logado.getIdConta())) {
+			for (Operacao t : new DaoOperacao().selecionarPorUsuario(logado.getIdUsuario())) {
 				fw.write(t.toCSV());
 			}
 		}

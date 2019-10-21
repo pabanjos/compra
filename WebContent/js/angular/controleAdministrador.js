@@ -1,5 +1,11 @@
 compra.controller('controleAdministrador', [ '$scope', '$rootScope', '$state', '$http', '$location', 'ngDialog', function($scope, $rootScope, $state, $http, $location) {
+	
+	$scope.prefixo = 'http://localhost:8080/WebService_REST/api'
+		
 	$scope.sair = function() {
+		delete $rootScope.logado;
+		$location.path("/acesso");
+		/*
 		$http({
 			method : 'POST',
 			url : 'ControleConta',
@@ -9,8 +15,9 @@ compra.controller('controleAdministrador', [ '$scope', '$rootScope', '$state', '
 		}).then(function(response) {
 			$location.path("/acesso");
 		}, function(response) {
-		});
+		});*/
 	};
+	
 	$scope.buscar = function() {
 		$http({
 			method : 'POST',
@@ -22,20 +29,26 @@ compra.controller('controleAdministrador', [ '$scope', '$rootScope', '$state', '
 			$scope.resposta = response.data;
 			$rootScope.logado = $scope.resposta.logado;
 		}, function(response) {
+			console.log(response)
 		});
 	};
-	$scope.exibir = function(list) {
+	
+	$scope.exibir = function(lista) {
 		$http({
 			method : 'GET',
-			url : 'http://localhost:8080/WebService_REST/controle/listas/' + list,
+			url : $scope.prefixo + '/' + lista,
 		}).then(function(response) {
-			$rootScope.lista = response.data;
+			$rootScope.lista = response.data.dados;
 		}, function(response) {
+			console.log(response)
 		});
 	};
+	
 	$scope.selecionar = function(item) {
 		$scope.selecionado = item;
 	}
+	
+	
 	/* clientes */
 	$scope.atualizar = function(id) {
 		$http({
@@ -57,9 +70,11 @@ compra.controller('controleAdministrador', [ '$scope', '$rootScope', '$state', '
 			}, function(response) {
 			});
 		}, function(response) {
+			console.log(response)
 		});
 		delete $scope.selecionado;
 	}
+	
 	$scope.tornar = function(id) {
 		$http({
 			method : 'PUT',
@@ -73,9 +88,11 @@ compra.controller('controleAdministrador', [ '$scope', '$rootScope', '$state', '
 			}, function(response) {
 			});
 		}, function(response) {
+			console.log(response)
 		});
 		delete $scope.selecionado;
 	}
+	
 	$scope.deletar = function(id) {
 		$http({
 			method : 'DELETE',
@@ -89,9 +106,12 @@ compra.controller('controleAdministrador', [ '$scope', '$rootScope', '$state', '
 			}, function(response) {
 			});
 		}, function(response) {
+			console.log(response)
 		});
 		delete $scope.selecionado;
 	}
+	
+	
 	/* filmes */
 	$scope.cadastrar = function() {
 		$http({
@@ -100,9 +120,11 @@ compra.controller('controleAdministrador', [ '$scope', '$rootScope', '$state', '
 		}).then(function(response) {
 			$rootScope.lista = response.data;
 		}, function(response) {
+			console.log(response)
 		});
 		delete $scope.novo;
 	};
+	
 	$scope.alterarEstoque = function(id) {
 		$http({
 			method : 'PUT',
@@ -110,9 +132,11 @@ compra.controller('controleAdministrador', [ '$scope', '$rootScope', '$state', '
 		}).then(function(response) {
 			$rootScope.lista = response.data;
 		}, function(response) {
+			console.log(response)
 		});
 		delete $scope.selecionado;
 	};
+	
 	$scope.deletarFilme = function(id) {
 		$http({
 			method : 'DELETE',
@@ -120,7 +144,9 @@ compra.controller('controleAdministrador', [ '$scope', '$rootScope', '$state', '
 		}).then(function(response) {
 			$rootScope.lista = response.data;
 		}, function(response) {
+			console.log(response)
 		});
 		delete $scope.selecionado;
 	};
+	
 } ]);

@@ -9,18 +9,19 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import beans.Operacao;
+import beans.Usuario;
 import controle.soap.BancoProxy;
-import modelo.entidades.Conta;
-import modelo.entidades.Transacao;
-import modelo.persistencia.DaoConta;
+import modelo.persistencia.DaoUsuario;
 
 @WebServlet("/ControleBanco")
 public class ControleBanco extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	protected void service(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-		Conta logado = (Conta) req.getSession().getAttribute("logado");
+	protected void service(final HttpServletRequest req, final HttpServletResponse res)
+			throws ServletException, IOException {
+		Usuario logado = (Usuario) req.getSession().getAttribute("logado");
 		String acao = req.getParameter("acao");
 		String mensagem = "{}";
 		try {
@@ -31,15 +32,16 @@ public class ControleBanco extends HttpServlet {
 				if ((req.getParameter("valor") == null) || (req.getParameter("operacao") == null)) {
 					mensagem = "{\"falha\":\"Preencha todos os campos\"}";
 				} else {
-					Transacao transacao = new Transacao(null, req.getParameter("operacao"), Integer.parseInt(req.getParameter("valor")), LocalDateTime.now(), logado, logado);
-					if (transacao.getValor() < 100 || transacao.getValor() > 999) {
+					Operacao transacao = new Operacao(null, req.getParameter("operacao"),
+							Integer.parseInt(req.getParameter("valor")), LocalDateTime.now(), logado, logado);
+					if ((transacao.getValor() < 100) || (transacao.getValor() > 999)) {
 						mensagem = "{\"falha\":\"Valor inválido\"}";
 					} else {
-						if (transacao.getOperacao().equals("deposito")) {
+						if (transacao.getTipo().equals("deposito")) {
 							logado.setSaldo(efetuar(transacao));
 							logado.getTransacoes().add(transacao);
 							mensagem = "{\"sucesso\":\"Valor depositado\"}";
-						} else if (transacao.getOperacao().equals("saque")) {
+						} else if (transacao.getTipo().equals("saque")) {
 							if (logado.getSaldo() < transacao.getValor()) {
 								mensagem = "{\"falha\":\"Valor excedeu seu saldo\"}";
 							} else {
@@ -47,19 +49,20 @@ public class ControleBanco extends HttpServlet {
 								logado.getTransacoes().add(transacao);
 								mensagem = "{\"sucesso\":\"Valor sacado\"}";
 							}
-						} else if (transacao.getOperacao().equals("transferencia")) {
-							if (req.getParameter("idConta") == null) {
+						} else if (transacao.getTipo().equals("transferencia")) {
+							if (req.getParameter("idUsuario") == null) {
 								mensagem = "{\"falha\":\"Preencha o nº da conta\"}";
 							} else {
-								Conta contaDestino = new DaoConta().selecionarContaPorId(Integer.parseInt(req.getParameter("idConta")));
+								Usuario contaDestino = new DaoUsuario()
+										.selecionarUsuarioPorId(Integer.parseInt(req.getParameter("idUsuario")));
 								if (contaDestino == null) {
-									mensagem = "{\"falha\":\"Conta inexistente\"}";
-								} else if (logado.getIdConta().equals(contaDestino.getIdConta())) {
+									mensagem = "{\"falha\":\"Usuario inexistente\"}";
+								} else if (logado.getIdUsuario().equals(contaDestino.getIdUsuario())) {
 									mensagem = "{\"falha\":\"Não pode transferir para si mesmo\"}";
 								} else if (logado.getSaldo() < transacao.getValor()) {
 									mensagem = "{\"falha\":\"Valor excedeu seu saldo\"}";
 								} else {
-									transacao.setContaDestino(contaDestino);
+									transacao.setUsuarioDestino(contaDestino);
 									logado.setSaldo(efetuar(transacao));
 									logado.getTransacoes().add(transacao);
 									mensagem = "{\"sucesso\":\"Valor transferido\"}";
@@ -73,7 +76,8 @@ public class ControleBanco extends HttpServlet {
 			e.printStackTrace();
 			mensagem = "{\"falha\":\"" + e.getMessage() + "\"}";
 		} finally {
-			String json = "{\"mensagem\":" + mensagem + ",\"saldo\":\"" + logado.getSaldo() + "\",\"transacoes\":" + logado.getTransacoes() + "}";
+			String json = "{\"mensagem\":" + mensagem + ",\"saldo\":\"" + logado.getSaldo() + "\",\"transacoes\":"
+					+ logado.getTransacoes() + "}";
 			res.setContentType("application/json");
 			res.setCharacterEncoding("UTF-8");
 			res.getWriter().write(json);
@@ -82,13 +86,13 @@ public class ControleBanco extends HttpServlet {
 		}
 	}
 
-	private Integer efetuar(Transacao t) throws Exception {
-		String op = t.getOperacao();
+	private Integer efetuar(final Operacao t) throws Exception {
+		String op = t.getTipo();
 		Integer va = t.getValor();
-		Integer id = t.getContaLocal().getIdConta();
-		Integer sa = t.getContaLocal().getSaldo();
-		Integer id2 = t.getContaDestino().getIdConta();
-		Integer sa2 = t.getContaDestino().getSaldo();
+		Integer id = t.getUsuarioLocal().getIdUsuario();
+		Integer sa = t.getUsuarioLocal().getSaldo();
+		Integer id2 = t.getUsuarioDestino().getIdUsuario();
+		Integer sa2 = t.getUsuarioDestino().getSaldo();
 		return new BancoProxy().efetuar(op, va, id, sa, id2, sa2);
 	}
 }

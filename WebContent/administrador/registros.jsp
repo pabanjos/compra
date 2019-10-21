@@ -1,10 +1,10 @@
 <section>
 	<form class="pure-form">
-		<table data-ng-init="exibir('acessos')">
+		<table data-ng-init="exibir('registros')">
 			<thead class="colorAdministrador">
 				<tr>
-					<th colspan="3">Acesso</th>
-					<th colspan="2">Conta</th>
+					<th colspan="3">Registro</th>
+					<th colspan="2">Usuario</th>
 				</tr>
 				<tr class="coluna">
 					<th data-ng-click="order='nome';direction=!direction">PC <i class="fa fa-sort" aria-hidden="true"></i></th>
@@ -22,12 +22,12 @@
 				</tr>
 			</thead>
 			<tbody data-ng-init="limit=8">
-				<tr data-ng-repeat="a in lista | filter:search | orderBy:order:direction | limitTo : limit">
-					<th>{{a.nome}}</th>
-					<th>{{a.ip}}</th>
-					<th>{{a.data | date:'dd/MM/yyyy'}} às {{a.data | date:'hh:mm'}}</th>
-					<th>{{a.conta.usuario}}</th>
-					<th>{{a.conta.perfil}}</th>
+				<tr data-ng-repeat="registro in lista | filter:search | orderBy:order:direction | limitTo : limit">
+					<th>{{registro.nome}}</th>
+					<th>{{registro.ip}}</th>
+					<th>{{registro.data | date:'dd/MM/yyyy'}} às {{registro.data | date:'hh:mm'}}</th>
+					<th>{{registro.usuario.login}}</th>
+					<th>{{registro.usuario.perfil}}</th>
 				</tr>
 			</tbody>
 		</table>

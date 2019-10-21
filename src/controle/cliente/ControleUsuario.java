@@ -11,27 +11,31 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import modelo.entidades.Acesso;
-import modelo.entidades.Compra;
-import modelo.entidades.Conta;
-import modelo.entidades.Pessoa;
+import beans.Compra;
+import beans.Pessoa;
+import beans.Registro;
+import beans.Usuario;
 import modelo.persistencia.DaoCompra;
-import modelo.persistencia.DaoConta;
-import modelo.persistencia.DaoTransacao;
+import modelo.persistencia.DaoOperacao;
+import modelo.persistencia.DaoUsuario;
 
-@WebServlet("/ControleConta")
-public class ControleConta extends HttpServlet {
+@WebServlet("/ControleUsuario")
+public class ControleUsuario extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	protected void service(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+	protected void service(final HttpServletRequest req, final HttpServletResponse res)
+			throws ServletException, IOException {
 		HttpSession session = req.getSession();
-		Conta logado = (Conta) session.getAttribute("logado");
+		Usuario logado = (Usuario) session.getAttribute("logado");
 		String acao = req.getParameter("acao");
 		String mensagem = "{}";
 		try {
 			if (acao.equals("cadastrar")) {
-				if (req.getParameter("nome") == null || req.getParameter("email") == null || req.getParameter("sexo") == null || req.getParameter("telefone") == null || req.getParameter("nascimento") == null || req.getParameter("usuario") == null || req.getParameter("senha") == null) {
+				if ((req.getParameter("nome") == null) || (req.getParameter("email") == null)
+						|| (req.getParameter("sexo") == null) || (req.getParameter("telefone") == null)
+						|| (req.getParameter("nascimento") == null) || (req.getParameter("usuario") == null)
+						|| (req.getParameter("senha") == null)) {
 					mensagem = "{\"falha\":\"Preencha todos os campos\"}";
 				} else {
 					Pessoa p = new Pessoa();
@@ -41,27 +45,27 @@ public class ControleConta extends HttpServlet {
 					p.setTelefone(req.getParameter("telefone"));
 					p.setCep(req.getParameter("cep"));
 					p.setNascimento(LocalDate.parse(req.getParameter("nascimento").substring(0, 10)));
-					Conta c = new Conta();
-					c.setUsuario(req.getParameter("usuario"));
+					Usuario c = new Usuario();
+					c.setLogin(req.getParameter("login"));
 					c.setSenha(req.getParameter("senha"));
 					c.setPerfil("Cliente");
 					c.setPessoa(p);
-					new DaoConta().inserir(c);
-					mensagem = "{\"sucesso\":\"Conta cadastrada\"}";
+					new DaoUsuario().inserir(c);
+					mensagem = "{\"sucesso\":\"Usuario cadastrada\"}";
 				}
 
 			} else if (acao.equals("entrar")) {
-				if (req.getParameter("usuario") == null || req.getParameter("senha") == null) {
+				if ((req.getParameter("login") == null) || (req.getParameter("senha") == null)) {
 					mensagem = "{\"falha\":\"Preencha todos os campos\"}";
 				} else {
-					String usuario = req.getParameter("usuario");
+					String login = req.getParameter("login");
 					String senha = req.getParameter("senha");
-					Conta resultado = new DaoConta().entrar(usuario, senha);
+					Usuario resultado = new DaoUsuario().entrar(login, senha);
 					if (resultado == null) {
 						mensagem = "{\"falha\":\"Dados inválidos\"}";
 					} else {
-						resultado.setCompras(new DaoCompra().selecionarPendentesPorConta(resultado.getIdConta()));
-						resultado.setTransacoes(new DaoTransacao().selecionarPorConta(resultado.getIdConta()));
+						resultado.setCompras(new DaoCompra().selecionarPendentesPorLogin(resultado.getIdUsuario()));
+						resultado.setTransacoes(new DaoOperacao().selecionarPorUsuario(resultado.getIdUsuario()));
 						inserirAcesso(resultado);
 						session.setAttribute("logado", resultado);
 						mensagem = "{\"sucesso\":\"Logado\"}";
@@ -69,24 +73,31 @@ public class ControleConta extends HttpServlet {
 				}
 
 			} else if (acao.equals("atualizar")) {
-				logado.setUsuario(req.getParameter("usuario") != null ? req.getParameter("usuario") : logado.getUsuario());
+				logado.setLogin(req.getParameter("usuario") != null ? req.getParameter("usuario") : logado.getLogin());
 				logado.setSenha(req.getParameter("senha") != null ? req.getParameter("senha") : logado.getSenha());
-				logado.getPessoa().setNome(req.getParameter("nome") != null ? req.getParameter("nome") : logado.getPessoa().getNome());
-				logado.getPessoa().setEmail(req.getParameter("email") != null ? req.getParameter("email") : logado.getPessoa().getEmail());
-				logado.getPessoa().setTelefone(req.getParameter("telefone") != null ? req.getParameter("telefone") : logado.getPessoa().getTelefone());
-				logado.getPessoa().setCep(req.getParameter("cep") != null ? req.getParameter("cep") : logado.getPessoa().getCep());
-				logado.getPessoa().setNascimento(req.getParameter("nascimento") != null ? LocalDate.parse(req.getParameter("nascimento").substring(0, 10)) : logado.getPessoa().getNascimento());
-				new DaoConta().atualizar(logado);
-				mensagem = "{\"sucesso\":\"Conta atualizada\"}";
+				logado.getPessoa().setNome(
+						req.getParameter("nome") != null ? req.getParameter("nome") : logado.getPessoa().getNome());
+				logado.getPessoa().setEmail(
+						req.getParameter("email") != null ? req.getParameter("email") : logado.getPessoa().getEmail());
+				logado.getPessoa().setTelefone(req.getParameter("telefone") != null ? req.getParameter("telefone")
+						: logado.getPessoa().getTelefone());
+				logado.getPessoa().setCep(
+						req.getParameter("cep") != null ? req.getParameter("cep") : logado.getPessoa().getCep());
+				logado.getPessoa()
+						.setNascimento(req.getParameter("nascimento") != null
+								? LocalDate.parse(req.getParameter("nascimento").substring(0, 10))
+								: logado.getPessoa().getNascimento());
+				new DaoUsuario().atualizar(logado);
+				mensagem = "{\"sucesso\":\"Usuario atualizada\"}";
 
 			} else if (acao.equals("sair")) {
 				session.invalidate();
 				mensagem = "{\"sucesso\":\"Deslogado\"}";
 
 			} else if (acao.equals("deletar")) {
-				new DaoConta().deletar(logado.getIdConta());
+				new DaoUsuario().deletar(logado.getIdUsuario());
 				session.invalidate();
-				mensagem = "{\"sucesso\":\"Conta deletada\"}";
+				mensagem = "{\"sucesso\":\"Usuario deletada\"}";
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -100,16 +111,16 @@ public class ControleConta extends HttpServlet {
 		}
 	}
 
-	private void inserirAcesso(Conta c) throws Exception {
-		Acesso acesso = new Acesso();
+	private void inserirAcesso(final Usuario c) throws Exception {
+		Registro acesso = new Registro();
 		acesso.setNome(InetAddress.getLocalHost().getHostName());
 		acesso.setIp(InetAddress.getLocalHost().getHostAddress());
-		acesso.setConta(c);
-		new DaoConta().inserirAcesso(acesso);
+		acesso.setUsuario(c);
+		new DaoUsuario().inserirAcesso(acesso);
 	}
 
-	private void retornar(HttpServletRequest req, HttpServletResponse res, String mensagem) {
-		Conta logado = (Conta) req.getSession().getAttribute("logado");
+	private void retornar(final HttpServletRequest req, final HttpServletResponse res, final String mensagem) {
+		Usuario logado = (Usuario) req.getSession().getAttribute("logado");
 		String json = "{\"mensagem\":" + mensagem;
 		try {
 			if (logado != null) {
@@ -127,8 +138,8 @@ public class ControleConta extends HttpServlet {
 		}
 	}
 
-	private void buscar(HttpServletRequest req, HttpServletResponse res, String mensagem) {
-		Conta logado = (Conta) req.getSession().getAttribute("logado");
+	private void buscar(final HttpServletRequest req, final HttpServletResponse res, final String mensagem) {
+		Usuario logado = (Usuario) req.getSession().getAttribute("logado");
 		String json = "{\"mensagem\":" + mensagem;
 		try {
 			if (logado != null) {

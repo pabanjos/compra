@@ -1,36 +1,36 @@
-compra.controller('controleAdministrador', [ '$scope', '$rootScope', '$state', '$http', '$location', 'ngDialog', function($scope, $rootScope, $state, $http, $location) {
+compra.controller('controleAdministrador', [ '$scope', '$rootScope', '$http', 
+	'$location', 'ngDialog', function($scope, $rootScope, $http, $location) {
 	
 	$scope.prefixo = 'http://localhost:8080/WebService_REST/api'
 		
+		$scope.exibirMensagens = function(logs) {
+			if (logs && logs.length > 0) {			
+				var log = logs[0];
+				if (log.tipo === 'sucesso') {
+					iziToast.success({
+						title: 'sucesso',
+						message: log.texto,
+						position: 'bottomRight',
+					});
+				} else if (log.tipo === 'falha') {
+					iziToast.error({
+						title: 'falha',
+						message: log.texto,
+						position: 'bottomRight',
+					});			
+				}
+			} else {
+				iziToast.error({
+					title: 'erro inesperado',
+					position: 'bottomRight',
+				});		
+			}
+		}
+
 	$scope.sair = function() {
 		delete $rootScope.logado;
+		$scope.exibirMensagens([{tipo:'sucesso',texto:'logout efetuado'}]);
 		$location.path("/acesso");
-		/*
-		$http({
-			method : 'POST',
-			url : 'ControleConta',
-			params : {
-				acao : 'sair'
-			}
-		}).then(function(response) {
-			$location.path("/acesso");
-		}, function(response) {
-		});*/
-	};
-	
-	$scope.buscar = function() {
-		$http({
-			method : 'POST',
-			url : 'ControleConta',
-			params : {
-				acao : 'buscar'
-			}
-		}).then(function(response) {
-			$scope.resposta = response.data;
-			$rootScope.logado = $scope.resposta.logado;
-		}, function(response) {
-			console.log(response)
-		});
 	};
 	
 	$scope.exibir = function(lista) {
@@ -38,9 +38,10 @@ compra.controller('controleAdministrador', [ '$scope', '$rootScope', '$state', '
 			method : 'GET',
 			url : $scope.prefixo + '/' + lista,
 		}).then(function(response) {
-			$rootScope.lista = response.data.dados;
+			$rootScope.lista = response.data.lista;
+			$scope.exibirMensagens(response.data.logs);
 		}, function(response) {
-			console.log(response)
+			$scope.exibirMensagens(response.data.logs);
 		});
 	};
 	
@@ -48,12 +49,11 @@ compra.controller('controleAdministrador', [ '$scope', '$rootScope', '$state', '
 		$scope.selecionado = item;
 	}
 	
-	
 	/* clientes */
 	$scope.atualizar = function(id) {
 		$http({
 			method : 'POST',
-			url : 'http://localhost:8080/WebService_REST/controle/cliente/atualizar/'
+			url : $scope.prefixo + '/cliente/atualizar/'
 				+ $scope.selecionado.usuario + '/'
 				+ $scope.selecionado.senha + '/'
 				+ id + '/'
@@ -64,13 +64,15 @@ compra.controller('controleAdministrador', [ '$scope', '$rootScope', '$state', '
 		}).then(function(response) {
 			$http({
 				method : 'GET',
-				url : 'http://localhost:8080/WebService_REST/controle/listas/clientes',
+				url : $scope.prefixo + '/listas/clientes',
 			}).then(function(response) {
-				$rootScope.lista = response.data;
+				$rootScope.lista = response.data.lista;
+				$scope.exibirMensagens(response.data.logs);
 			}, function(response) {
+				$scope.exibirMensagens(response.data.logs);
 			});
 		}, function(response) {
-			console.log(response)
+			$scope.exibirMensagens(response.data.logs);
 		});
 		delete $scope.selecionado;
 	}
@@ -78,17 +80,18 @@ compra.controller('controleAdministrador', [ '$scope', '$rootScope', '$state', '
 	$scope.tornar = function(id) {
 		$http({
 			method : 'PUT',
-			url : 'http://localhost:8080/WebService_REST/controle/cliente/atualizar/' + id
+			url : $scope.prefixo + '/cliente/atualizar/' + id
 		}).then(function(response) {
 			$http({
 				method : 'GET',
-				url : 'http://localhost:8080/WebService_REST/controle/listas/clientes',
+				url : $scope.prefixo + '/listas/clientes',
 			}).then(function(response) {
-				$rootScope.lista = response.data;
+				$rootScope.lista = response.data.lista;
+				$scope.exibirMensagens(response.data.logs);
 			}, function(response) {
+				$scope.exibirMensagens(response.data.logs);
 			});
 		}, function(response) {
-			console.log(response)
 		});
 		delete $scope.selecionado;
 	}
@@ -96,17 +99,18 @@ compra.controller('controleAdministrador', [ '$scope', '$rootScope', '$state', '
 	$scope.deletar = function(id) {
 		$http({
 			method : 'DELETE',
-			url : 'http://localhost:8080/WebService_REST/controle/cliente/deletar/' + id
+			url : $scope.prefixo + '/cliente/deletar/' + id
 		}).then(function(response) {
 			$http({
 				method : 'GET',
-				url : 'http://localhost:8080/WebService_REST/controle/listas/clientes',
+				url : $scope.prefixo + '/listas/clientes',
 			}).then(function(response) {
-				$rootScope.lista = response.data;
+				$rootScope.lista = response.data.lista;
+				$scope.exibirMensagens(response.data.logs);
 			}, function(response) {
+				$scope.exibirMensagens(response.data.logs);
 			});
 		}, function(response) {
-			console.log(response)
 		});
 		delete $scope.selecionado;
 	}
@@ -116,11 +120,12 @@ compra.controller('controleAdministrador', [ '$scope', '$rootScope', '$state', '
 	$scope.cadastrar = function() {
 		$http({
 			method : 'POST',
-			url : 'http://localhost:8080/WebService_REST/controle/filme/' + JSON.stringify($scope.novo)
+			url : $scope.prefixo + '/filme/' + JSON.stringify($scope.novo)
 		}).then(function(response) {
-			$rootScope.lista = response.data;
+			$rootScope.lista = response.data.lista;
+			$scope.exibirMensagens(response.data.logs);
 		}, function(response) {
-			console.log(response)
+			$scope.exibirMensagens(response.data.logs);
 		});
 		delete $scope.novo;
 	};
@@ -128,11 +133,12 @@ compra.controller('controleAdministrador', [ '$scope', '$rootScope', '$state', '
 	$scope.alterarEstoque = function(id) {
 		$http({
 			method : 'PUT',
-			url : 'http://localhost:8080/WebService_REST/controle/filme/' + $scope.selecionado.estoque + '/' + id
+			url : $scope.prefixo + '/filme/' + $scope.selecionado.estoque + '/' + id
 		}).then(function(response) {
-			$rootScope.lista = response.data;
+			$rootScope.lista = response.data.lista;
+			$scope.exibirMensagens(response.data.logs);
 		}, function(response) {
-			console.log(response)
+			$scope.exibirMensagens(response.data.logs);
 		});
 		delete $scope.selecionado;
 	};
@@ -140,11 +146,12 @@ compra.controller('controleAdministrador', [ '$scope', '$rootScope', '$state', '
 	$scope.deletarFilme = function(id) {
 		$http({
 			method : 'DELETE',
-			url : 'http://localhost:8080/WebService_REST/controle/filme/' + id
+			url : $scope.prefixo + '/filme/' + id
 		}).then(function(response) {
-			$rootScope.lista = response.data;
+			$rootScope.lista = response.data.lista;
+			$scope.exibirMensagens(response.data.logs);
 		}, function(response) {
-			console.log(response)
+			$scope.exibirMensagens(response.data.logs);
 		});
 		delete $scope.selecionado;
 	};

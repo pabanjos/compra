@@ -17,13 +17,13 @@ create table pessoa (
 	sexo            varchar(15),
 	telefone        varchar(15),
 	cep             varchar(15),
-	nascimento      date,
+	nascimento      timestamp,
 	usuario			int             unique,
     foreign key (usuario) references usuario (idUsuario) ON DELETE CASCADE
 );
 
-create table acesso (
-    idAcesso        int             primary key    auto_increment,
+create table registro (
+    idRegistro      int             primary key    auto_increment,
     nome            varchar(20),
     ip              varchar(20),
     data            timestamp,

@@ -9,9 +9,9 @@ compra.config(function($stateProvider, $urlRouterProvider) {
 		url : "/cliente",
 		templateUrl : "cliente/header.jsp",
 		controller : "controleCliente"
-	}).state('cliente.conta', {
-		url : "/conta",
-		templateUrl : "cliente/conta.jsp",
+	}).state('cliente.usuario', {
+		url : "/usuario",
+		templateUrl : "cliente/usuario.jsp",
 		controller : "controleCliente"
 	}).state('cliente.banco', {
 		url : "/banco",

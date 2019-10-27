@@ -1,128 +1,132 @@
-compra.controller('controleCliente', [ '$scope', '$rootScope', '$http', '$location', function($scope, $rootScope, $http, $location) {
+compra.controller('controleCliente', [ '$scope', '$rootScope', '$http', 
+	'$location', function($scope, $rootScope, $http, $location) {
 	
 	$scope.prefixo = 'http://localhost:8080/WebService_REST/api'
+		
+	var array = document.querySelectorAll('button');
+	$scope.id = '';
+	$scope.text = '';
+	for (var i = 0; i < array.length; i++) {
+	    array[i].addEventListener('click', function(event) {
+			event.toElement.disabled = true;
+			$scope.id = this.id;
+			$scope.text = this.textContent;
+	    	const icon = this.querySelector('i');
+			const text = this.querySelector('span');
+			if (icon) {
+				icon.classList.add('fa-spinner');
+				icon.classList.add('fa-pulse');
+			}
+			if (text) {
+				text.innerHTML = 'processando..';
+			}
+	    });
+	}
+
+	$scope.complete = function() {
+		var element = document.getElementById($scope.id);
+		if (element) {
+			element.disabled = false;
+			if (element.querySelector('i')) {
+				element.querySelector('i').classList.remove("fa-spinner");
+				element.querySelector('i').classList.remove("fa-pulse");
+			}
+			if (element.querySelector('span')) {
+				element.querySelector('span').innerHTML = $scope.text;
+			}
+		}
+	}
+		
+	$scope.exibirMensagens = function(logs) {
+		if (logs && logs.length > 0) {
+			var log = logs[0];
+			if (log.tipo === 'sucesso') {
+				iziToast.success({
+				    transitionIn: 'bounceInLeft',
+					title: 'sucesso',
+					message: log.texto,
+					position: 'bottomRight'
+				});
+			} else if (log.tipo === 'falha') {
+				iziToast.error({
+				    transitionIn: 'bounceInLeft',
+					title: 'falha',
+					message: log.texto,
+					position: 'bottomRight'
+				});			
+			}
+		} else {
+			iziToast.error({
+			    transitionIn: 'bounceInLeft',
+				title: 'erro inesperado',
+				position: 'bottomRight'
+			});		
+		}
+		$scope.complete();
+	}
+	
+	$scope.convidado = {login:'qwe',senha:'qwe'};
 	
 	/* acesso */
 	$scope.entrar = function() {
-		$http.post($scope.prefixo + '/usuarios/entrar', $scope.usuario
-		).then(function(response) {
-			$scope.resposta = response.data;
-			if($scope.resposta.dados === undefined) {
-				$location.path("/acesso");
-			} else {
-				$rootScope.logado = $scope.resposta.dados;
-				if ($rootScope.logado.perfil === 'Cliente') {
-					$rootScope.saldo = $rootScope.logado.saldo;
-					$location.path("/cliente");
-				} else if ($rootScope.logado.perfil === 'Administrador') {
-					$location.path("/administrador");
+		$http.post($scope.prefixo + '/usuarios/entrar', $scope.convidado)
+			.then(function(response) {
+				if(response.data.logado === undefined) {
+					$location.path("/acesso");
+				} else {
+					$rootScope.logado = response.data.logado;
+					if ($rootScope.logado.perfil === 'Cliente') {
+						$location.path("/cliente");
+					} else if ($rootScope.logado.perfil === 'Administrador') {
+						$location.path("/administrador");
+					}
 				}
-			}
-			$rootScope.logs = $scope.resposta.logs;
-		}, function(response) {
-			console.log(response)
-		});
-		$scope.usuario = {};
+				$scope.exibirMensagens(response.data.logs);
+			}, function(response) {
+				$scope.exibirMensagens(response.data.logs);
+			});
 	};
 	
 	$scope.sair = function() {
 		delete $rootScope.logado;
+		$scope.exibirMensagens([{tipo:'sucesso',texto:'logout efetuado'}]);
 		$location.path("/acesso");
-		/*
-		$http({
-			method : 'GET',
-			url : $scope.prefixo + '/usuarios/sair'
-		}).then(function(response) {
-			$scope.resposta = response.data;
-			$rootScope.logs = $scope.resposta.logs;
-			delete $rootScope.logado;
-			$location.path("/acesso");
-		}, function(response) {
-		});*/
 	};
-	
-	$scope.apagarMensagem = function() {
-		$rootScope.logs = {};
-	}
 	
 	$scope.cadastrar = function() {
-		$http({
-			method : 'POST',
-			url : $scope.prefixo + '/usuarios',
-			params : {
-				login : $scope.nova.login,
-				senha : $scope.nova.senha,
-				nome : $scope.nova.nome,
-				email : $scope.nova.email,
-				sexo : $scope.nova.sexo,
-				telefone : $scope.nova.telefone,
-				cep : $scope.nova.cep,
-				nascimento : $scope.nova.nascimento
-			}
-		}).then(function(response) {
-			$scope.resposta = response.data;
-			$rootScope.logs = $scope.resposta.logs;
-		}, function(response) {
-			console.log(response)
-		});
-		delete $scope.nova;
-	};
-	
-	$scope.buscar = function() {
-		$http({
-			method : 'POST',
-			url : 'ControleUsuario',
-			params : {
-				acao : 'buscar'
-			}
-		}).then(function(response) {
-			$scope.resposta = response.data;
-			$rootScope.saldo = $scope.resposta.saldo;
-			$rootScope.logado = $scope.resposta.logado;
-			$rootScope.logs = $scope.resposta.logs;
-		}, function(response) {
-			console.log(response)
-		});
+		$http.post($scope.prefixo + '/usuarios', $scope.novo)
+			.then(function(response) {
+				delete $scope.novo;
+				$scope.exibirMensagens(response.data.logs);
+			}, function(response) {
+				delete $scope.novo;
+				$scope.exibirMensagens(response.data.logs);
+			});
 	};
 	
 	$scope.atualizar = function() {
-		$http({
-			method : 'POST',
-			url : 'ControleUsuario',
-			params : {
-				acao : 'atualizar',
-				login : $scope.login,
-				senha : $scope.senha,
-				nome : $scope.nome,
-				email : $scope.email,
-				telefone : $scope.telefone,
-				cep : $scope.cep,
-				nascimento : $scope.nascimento
-			}
-		}).then(function(response) {
-			$scope.resposta = response.data;
-			$rootScope.logado = $scope.resposta.logado;
-			$rootScope.logs = $scope.resposta.logs;
-		}, function(response) {
-			console.log(response)
-		});
+		$http.put($scope.prefixo + '/usuarios', $scope.atual)
+			.then(function(response) {
+				$rootScope.logado = $scope.atual;
+				$scope.exibirMensagens(response.data.logs);
+			}, function(response) {
+				$scope.atual = $rootScope.logado;
+				$scope.exibirMensagens(response.data.logs);
+			});
+	};
+
+	$scope.obterUsuarioAtual = function() {
+		$scope.atual = $rootScope.logado;
 	};
 	
 	$scope.deletar = function() {
-		$http({
-			method : 'POST',
-			url : 'ControleUsuario',
-			params : {
-				acao : 'deletar'
-			}
-		}).then(function(response) {
-			$scope.resposta = response.data;
-			$rootScope.logs = $scope.resposta.logs;
-			delete $rootScope.logado;
-			$location.path("/acesso");
-		}, function(response) {
-			console.log(response)
-		});
+		$http.delete($scope.prefixo + '/usuarios/' + $rootScope.logado.idUsuario)
+			.then(function(response) {
+				$location.path("/acesso");
+				$scope.exibirMensagens(response.data.logs);
+			}, function(response) {
+				$scope.exibirMensagens(response.data.logs);
+			});
 	};
 	
 	
@@ -138,11 +142,9 @@ compra.controller('controleCliente', [ '$scope', '$rootScope', '$http', '$locati
 				idConta : $scope.banco.idConta,
 			}
 		}).then(function(response) {
-			$scope.resposta = response.data;
-			$rootScope.saldo = $scope.resposta.saldo;
-			$rootScope.logs = $scope.resposta.logs;
+			$scope.exibirMensagens(response.data.logs);
 		}, function(response) {
-			console.log(response)
+			$scope.exibirMensagens(response.data.logs);
 		});
 		delete $scope.banco;
 	};
@@ -155,10 +157,9 @@ compra.controller('controleCliente', [ '$scope', '$rootScope', '$http', '$locati
 				acao : 'exportar'
 			}
 		}).then(function(response) {
-			$scope.resposta = response.data;
-			$rootScope.logs = $scope.resposta.logs;
+			$scope.exibirMensagens(response.data.logs);
 		}, function(response) {
-			console.log(response)
+			$scope.exibirMensagens(response.data.logs);
 		});
 	};
 	
@@ -169,9 +170,9 @@ compra.controller('controleCliente', [ '$scope', '$rootScope', '$http', '$locati
 			method : 'GET',
 			url : 'http://localhost:8080/WebService_REST/controle/listas/filmes'
 		}).then(function(response) {
-			$scope.lista = response.data;
+			$scope.exibirMensagens(response.data.logs);
 		}, function(response) {
-			console.log(response)
+			$scope.exibirMensagens(response.data.logs);
 		});
 	};
 	
@@ -183,10 +184,9 @@ compra.controller('controleCliente', [ '$scope', '$rootScope', '$http', '$locati
 				acao : ''
 			}
 		}).then(function(response) {
-			$scope.resposta = response.data;
-			$rootScope.logs = $scope.resposta.logs;
+			$scope.exibirMensagens(response.data.logs);
 		}, function(response) {
-			console.log(response)
+			$scope.exibirMensagens(response.data.logs);
 		});
 	};
 	
@@ -199,10 +199,9 @@ compra.controller('controleCliente', [ '$scope', '$rootScope', '$http', '$locati
 				idFilme : id
 			}
 		}).then(function(response) {
-			$scope.resposta = response.data;
-			$rootScope.logs = $scope.resposta.logs;
+			$scope.exibirMensagens(response.data.logs);
 		}, function(response) {
-			console.log(response)
+			$scope.exibirMensagens(response.data.logs);
 		});
 	};
 	
@@ -215,10 +214,9 @@ compra.controller('controleCliente', [ '$scope', '$rootScope', '$http', '$locati
 				idFilme : id
 			}
 		}).then(function(response) {
-			$scope.resposta = response.data;
-			$rootScope.logs = $scope.resposta.logs;
+			$scope.exibirMensagens(response.data.logs);
 		}, function(response) {
-			console.log(response)
+			$scope.exibirMensagens(response.data.logs);
 		});
 	};
 	
@@ -231,10 +229,9 @@ compra.controller('controleCliente', [ '$scope', '$rootScope', '$http', '$locati
 				cupom : $scope.cupom
 			}
 		}).then(function(response) {
-			$scope.resposta = response.data;
-			$rootScope.logs = $scope.resposta.logs;
+			$scope.exibirMensagens(response.data.logs);
 		}, function(response) {
-			console.log(response)
+			$scope.exibirMensagens(response.data.logs);
 		});
 		delete $scope.cupom;
 	};
@@ -247,10 +244,9 @@ compra.controller('controleCliente', [ '$scope', '$rootScope', '$http', '$locati
 				acao : 'retirar'
 			}
 		}).then(function(response) {
-			$scope.resposta = response.data;
-			$rootScope.logs = $scope.resposta.logs;
+			$scope.exibirMensagens(response.data.logs);
 		}, function(response) {
-			console.log(response)
+			$scope.exibirMensagens(response.data.logs);
 		});
 	};
 	
@@ -262,11 +258,9 @@ compra.controller('controleCliente', [ '$scope', '$rootScope', '$http', '$locati
 				acao : 'finalizar'
 			}
 		}).then(function(response) {
-			$scope.resposta = response.data;
-			$rootScope.saldo = $scope.resposta.saldo;
-			$rootScope.logs = $scope.resposta.logs;
+			$scope.exibirMensagens(response.data.logs);
 		}, function(response) {
-			console.log(response)
+			$scope.exibirMensagens(response.data.logs);
 		});
 	};
 	
@@ -278,10 +272,9 @@ compra.controller('controleCliente', [ '$scope', '$rootScope', '$http', '$locati
 				acao : 'salvar'
 			}
 		}).then(function(response) {
-			$scope.resposta = response.data;
-			$rootScope.logs = $scope.resposta.logs;
+			$scope.exibirMensagens(response.data.logs);
 		}, function(response) {
-			console.log(response)
+			$scope.exibirMensagens(response.data.logs);
 		});
 	};
 	
@@ -295,9 +288,9 @@ compra.controller('controleCliente', [ '$scope', '$rootScope', '$http', '$locati
 				acao : ''
 			}
 		}).then(function(response) {
-			$scope.chat = response.data;
+			$scope.exibirMensagens(response.data.logs);
 		}, function(response) {
-			console.log(response)
+			$scope.exibirMensagens(response.data.logs);
 		});
 	};
 	
@@ -310,9 +303,9 @@ compra.controller('controleCliente', [ '$scope', '$rootScope', '$http', '$locati
 				idContato : id
 			}
 		}).then(function(response) {
-			$scope.chat = response.data;
+			$scope.exibirMensagens(response.data.logs);
 		}, function(response) {
-			console.log(response)
+			$scope.exibirMensagens(response.data.logs);
 		});
 	};
 	
@@ -325,9 +318,9 @@ compra.controller('controleCliente', [ '$scope', '$rootScope', '$http', '$locati
 				texto : $scope.texto
 			}
 		}).then(function(response) {
-			$scope.chat = response.data;
+			$scope.exibirMensagens(response.data.logs);
 		}, function(response) {
-			console.log(response)
+			$scope.exibirMensagens(response.data.logs);
 		});
 		delete $scope.texto;
 	};

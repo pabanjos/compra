@@ -1,4 +1,4 @@
-compra.controller('controleCliente', [ '$scope', '$rootScope', '$http', 
+compra.controller('controleUsuario', [ '$scope', '$rootScope', '$http', 
 	'$location', function($scope, $rootScope, $http, $location) {
 	
 	$scope.prefixo = 'http://localhost:8080/WebService_REST/api'
@@ -55,28 +55,22 @@ compra.controller('controleCliente', [ '$scope', '$rootScope', '$http',
 					position: 'bottomRight'
 				});			
 			}
-		} else {
-			iziToast.error({
-			    transitionIn: 'bounceInLeft',
-				title: 'erro inesperado',
-				position: 'bottomRight'
-			});		
 		}
 		$scope.complete();
 	}
 	
 	$scope.convidado = {login:'qwe',senha:'qwe'};
 	
-	/* acesso */
+	/* inicio */
 	$scope.entrar = function() {
 		$http.post($scope.prefixo + '/usuarios/entrar', $scope.convidado)
 			.then(function(response) {
-				if(response.data.logado === undefined) {
-					$location.path("/acesso");
+				if (response.data.logado === undefined) {
+					$location.path("/inicio");
 				} else {
 					$rootScope.logado = response.data.logado;
 					if ($rootScope.logado.perfil === 'Cliente') {
-						$location.path("/cliente");
+						$location.path("/usuario");
 					} else if ($rootScope.logado.perfil === 'Administrador') {
 						$location.path("/administrador");
 					}
@@ -88,9 +82,18 @@ compra.controller('controleCliente', [ '$scope', '$rootScope', '$http',
 	};
 	
 	$scope.sair = function() {
-		delete $rootScope.logado;
-		$scope.exibirMensagens([{tipo:'sucesso',texto:'logout efetuado'}]);
-		$location.path("/acesso");
+		if ($rootScope.logado) {			
+			$http.post($scope.prefixo + '/usuarios/sair', $rootScope.logado)
+			.then(function(response) {
+				$scope.exibirMensagens(response.data.logs);
+				delete $rootScope.logado;
+				$location.path("/inicio");
+			}, function(response) {
+				$scope.exibirMensagens(response.data.logs);
+			});
+		} else {
+			$location.path("/inicio");
+		}
 	};
 	
 	$scope.cadastrar = function() {
@@ -122,58 +125,36 @@ compra.controller('controleCliente', [ '$scope', '$rootScope', '$http',
 	$scope.deletar = function() {
 		$http.delete($scope.prefixo + '/usuarios/' + $rootScope.logado.idUsuario)
 			.then(function(response) {
-				$location.path("/acesso");
+				$location.path("/inicio");
 				$scope.exibirMensagens(response.data.logs);
 			}, function(response) {
 				$scope.exibirMensagens(response.data.logs);
 			});
 	};
 	
-	
-	/* banco */
-	$scope.efetuar = function() {
-		$http({
-			method : 'POST',
-			url : 'ControleBanco',
-			params : {
-				acao : 'efetuar',
-				operacao : $scope.banco.operacao,
-				valor : $scope.banco.valor,
-				idConta : $scope.banco.idConta,
-			}
-		}).then(function(response) {
-			$scope.exibirMensagens(response.data.logs);
-		}, function(response) {
-			$scope.exibirMensagens(response.data.logs);
-		});
-		delete $scope.banco;
-	};
-	
-	$scope.exportar = function() {
-		$http({
-			method : 'POST',
-			url : 'ControleBanco',
-			params : {
-				acao : 'exportar'
-			}
-		}).then(function(response) {
-			$scope.exibirMensagens(response.data.logs);
-		}, function(response) {
-			$scope.exibirMensagens(response.data.logs);
-		});
-	};
-	
-	
-	/* compra */
+	/* loja */
 	$scope.exibir = function() {
-		$http({
-			method : 'GET',
-			url : 'http://localhost:8080/WebService_REST/controle/listas/filmes'
-		}).then(function(response) {
-			$scope.exibirMensagens(response.data.logs);
-		}, function(response) {
-			$scope.exibirMensagens(response.data.logs);
-		});
+		$http.get($scope.prefixo + '/filmes', {headers:{'login':$rootScope.logado.login}})
+			.then(function(response) {
+				$scope.lista = response.data.lista;
+				$scope.exibirMensagens(response.data.logs);
+			}, function(response) {
+				$scope.exibirMensagens(response.data.logs);
+			});
+	};
+
+	$scope.carrinho = [];
+	
+	$scope.adicionar = function(filme) {
+		$scope.carrinho.push(filme);
+		/*
+		$http.post($scope.prefixo + '/compras/'+id, {headers:{'login':$rootScope.logado.login}})
+			.then(function(response) {
+				$scope.exibirMensagens(response.data.logs);
+			}, function(response) {
+				$scope.exibirMensagens(response.data.logs);
+			});
+		*/
 	};
 	
 	$scope.calcular = function() {
@@ -196,21 +177,6 @@ compra.controller('controleCliente', [ '$scope', '$rootScope', '$http',
 			url : 'ControleCarrinho',
 			params : {
 				acao : 'remover',
-				idFilme : id
-			}
-		}).then(function(response) {
-			$scope.exibirMensagens(response.data.logs);
-		}, function(response) {
-			$scope.exibirMensagens(response.data.logs);
-		});
-	};
-	
-	$scope.adicionar = function(id) {
-		$http({
-			method : 'POST',
-			url : 'ControleCarrinho',
-			params : {
-				acao : 'adicionar',
 				idFilme : id
 			}
 		}).then(function(response) {
@@ -270,6 +236,40 @@ compra.controller('controleCliente', [ '$scope', '$rootScope', '$http',
 			url : 'ControleCarrinho',
 			params : {
 				acao : 'salvar'
+			}
+		}).then(function(response) {
+			$scope.exibirMensagens(response.data.logs);
+		}, function(response) {
+			$scope.exibirMensagens(response.data.logs);
+		});
+	};
+	
+	
+	/* banco */
+	$scope.efetuar = function() {
+		$http({
+			method : 'POST',
+			url : 'ControleBanco',
+			params : {
+				acao : 'efetuar',
+				operacao : $scope.banco.operacao,
+				valor : $scope.banco.valor,
+				idConta : $scope.banco.idConta,
+			}
+		}).then(function(response) {
+			$scope.exibirMensagens(response.data.logs);
+		}, function(response) {
+			$scope.exibirMensagens(response.data.logs);
+		});
+		delete $scope.banco;
+	};
+	
+	$scope.exportar = function() {
+		$http({
+			method : 'POST',
+			url : 'ControleBanco',
+			params : {
+				acao : 'exportar'
 			}
 		}).then(function(response) {
 			$scope.exibirMensagens(response.data.logs);

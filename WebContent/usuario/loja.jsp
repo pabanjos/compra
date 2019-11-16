@@ -1,4 +1,4 @@
-<section data-ng-init="buscar();exibir()">
+<section data-ng-init="exibir()">
 	<form class="pure-form filtro">
 		<select class="pure-input-1-5" data-ng-model="search.genero">
 			<option value="">genero..</option>
@@ -17,7 +17,7 @@
 		<input type="search" class="pure-input-1-5" data-ng-model="search.protagonista" placeholder="Protagonista..">
 		<select class="pure-input-1-5" data-ng-model="order">
 			<option value="">ordem..</option>
-			<option value="preco">Maior preco</option>
+			<option value="preco">Maior preço</option>
 			<option value="lancamento">Mais recentes</option>
 		</select>
 	</form>
@@ -29,7 +29,7 @@
 			<br />
 			<p class="green">Preço: {{item.preco | currency : "R$" }}</p>
 			<br />
-			<button class="pure-button button-small button-secondary" data-ng-click="adicionar(item.idFilme)">Adicionar <i class="fa fa-cart-plus" aria-hidden="true"></i></button>
+			<button class="pure-button button-small button-secondary" data-ng-click="adicionar(item)">Adicionar <i class="fa fa-cart-plus" aria-hidden="true"></i></button>
 		</figcaption>
 	</figure>
 </section>

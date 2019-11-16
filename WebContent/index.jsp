@@ -25,7 +25,7 @@
 <script src="js/angular/ngDialog.min.js"></script>
 <script src="js/angular/mask.min.js"></script>
 <script src="js/angular/route.js"></script>
-<script src="js/angular/controleCliente.js"></script>
+<script src="js/angular/controleUsuario.js"></script>
 <script src="js/angular/controleAdministrador.js"></script>
 </head>
 <body>

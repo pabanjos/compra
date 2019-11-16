@@ -364,7 +364,7 @@ INSERT INTO filme VALUES
 
 (null,'The Blair Witch Project 1999.jpg','The Blair Witch Project','Terror','Heather Donahue','Daniel Myrick',1999,64,10),
 (null,'Paranormal Activity 2007.jpg','Paranormal Activity','Terror','Katie Featherston','Oren Peli',2007,63,10),
-(null,'[Rec] 2007.jpg','[Rec]','Terror','Manuela Velasco','Jaume Balagueró',2007,75,10),
+(null,'Rec 2007.jpg','Rec','Terror','Manuela Velasco','Jaume Balagueró',2007,75,10),
 (null,'Grave Encounters 2011.jpg','Grave Encounters','Terror','Ben Wilkinson','Colin Minihan',2011,61,10),
 (null,'As Above, So Below 2014.jpg','As Above, So Below','Terror','Perdita Weeks','John Erick Dowdle',2014,61,10);
 
